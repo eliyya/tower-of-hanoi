@@ -25,16 +25,10 @@ public class App {
      * @throws IOException si ocurre un error al escribir el archivo JSON
      */
     public static void main(String[] args) throws IOException {
-        IO.println("Ingresa el estado inicial de...");
-        var sx = Validations.validateBote(IO.readln("Bote x (0-3):"), 3);
-        var sy = Validations.validateBote(IO.readln("Bote y (0-4):"), 4);
-        var tree = new Node(sx, sy);
+        var startState = getState(true);
+        var finalState = getState(false);
 
-        IO.println("Ingresa el estado final de...");
-        var fx = Validations.validateBote(IO.readln("Bote x (0-3):"), 3);
-        var fy = Validations.validateBote(IO.readln("Bote y (0-4):"), 4);
-        var finalState = new State(fx, fy);
-
+        var tree = new Node(startState);
         var level = new ArrayList<Node>(List.of(tree));
 
         Node finded;
@@ -62,5 +56,43 @@ public class App {
 
         IO.println("Se generó un archivo tree.json para visualizar el tree generado en jsoncrack.eliyya.dev/editor");
 
+    }
+
+    static State<State<Integer>> getState(boolean init) {
+        var state = new State<State<Integer>>();
+        var disks = new State<Integer>();
+        for (int t = 0; t < 3; t++) {
+            IO.println(String.format("Estado %s de la torre %d...", init ? "inicial" : "final", t+1));
+            var tower = new State<Integer>();
+            for (int i = 0; i < 3; i++) {
+                var s = Validations.validateDisc(IO.readln("ingrese de 1 a 3 (deje en blanco para la siguiente torre):"), 3);
+                if (s == -1) {
+                    i--;
+                    continue;
+                } else if (s == 0) {
+                    break;
+                } else {
+                    if (disks.contains(s)) {
+                        IO.println("No se puede repetir discos");
+                        i--;
+                        continue;
+                    }
+                    disks.add(s);
+                    if (tower.isEmpty()) {
+                        tower.add(s);
+                    } else {
+                        var last = tower.getLast();
+                        if (last > s) {
+                            tower.add(s);
+                            continue;
+                        } 
+                        IO.println("No se puede colocar un disco más grande sobre uno más pequeño");
+                        i--;
+                    }
+                }
+            }
+            state.add(tower);
+        }
+        return state;   
     }
 }

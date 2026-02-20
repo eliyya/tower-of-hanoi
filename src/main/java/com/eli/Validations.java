@@ -13,9 +13,10 @@ public class Validations {
      * @param max  valor máximo permitido (inclusive)
      * @return el entero parseado si es válido
      */
-    public static int validateBote(Object read, int max) {
-        int state = 0;
+    public static int validateDisc(Object read, int max) {
+        int state = 1;
         if (read instanceof String str) {
+            if (str.isBlank()) return 0;
             try {
                 state = Integer.parseInt(str);
             } catch (Exception e) {
@@ -24,15 +25,15 @@ public class Validations {
             }
         } else {
             IO.print("Tiene que ser un numero entero");
-            System.exit(1);
+            return -1;
         }
-        if (state < 0) {
-            IO.print("No puede ser menor que 0");
-            System.exit(1);
+        if (state < 1) {
+            IO.print("No puede ser menor que 1");
+            return -1;
         }
         if (state > max) {
             IO.print("No puede ser mayor que "+max);
-            System.exit(1);
+            return -1;
         }
         return state;
     }
@@ -44,11 +45,15 @@ public class Validations {
      * @param state estado objetivo
      * @return el nodo encontrado o `null` si no existe
      */
-    static Node find(ArrayList<Node> list, State state) {
+    static Node find(ArrayList<Node> list, State<?> state) {
         for (Node node : list) {
             if (node.state().equals(state))
                 return node;
         }
         return null;
+    }
+
+    static boolean canContinue(int last, int max) {
+        return false;
     }
 }

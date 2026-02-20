@@ -12,12 +12,12 @@ import java.util.Map;
  * estado desde su padre.
  */
 public class Node {
-    private State state = new State();
+    private State<State<Integer>> state = new State<>();
     private ArrayList<Node> childrens = new ArrayList<Node>();
     private Node parent;
     private String action = "Inicio";
 
-    public State state() {
+    public State<State<Integer>> state() {
         return state;
     }
 
@@ -35,114 +35,28 @@ public class Node {
         return this;
     }
 
-    public Node(int x, int y) {
-        this.state = new State(x, y);
+    public Node() {
+        this.state = new State<>();
+        this.state.add(new State<>());
+        this.state.add(new State<>());
+        this.state.add(new State<>());
     }
 
-    public Node(State state) {
+    public Node(State<State<Integer>> state) {
         this.state = state;
     }
 
-    public Node vaciarX() {
-        /**
-         * Vacía completamente el jarro X y devuelve el nuevo nodo resultante.
-         *
-         * @return nuevo `Node` con X = 0
-         * @throws Error si X ya está vacío
-         */
-        if (state.x() > 0) {
-            return new Node(state.setX(0)).setParent(this).setAction("Vaciar x");
-        } else {
-            throw new Error("X no contiene algo");
+    public Node pasar(int x, int y) {
+        var t1 = this.state.get(x);
+        var t2 = this.state.get(y);
+        var d1 = t1.getLast();
+        var d2 = t2.getLast();
+        if (d1 > d2) {
+            var newState = this.state.clone();
+            newState.get(y).add(newState.get(x).removeLast());
+            return new Node(newState).setParent(this).setAction(String.format("pasar %d a %d", x, y));
         }
-    }
-
-    public Node vaciarY() {
-        /**
-         * Vacía completamente el jarro Y y devuelve el nuevo nodo resultante.
-         *
-         * @return nuevo `Node` con Y = 0
-         * @throws Error si Y ya está vacío
-         */
-        if (state.y() > 0) {
-            return new Node(state.setY(0)).setParent(this).setAction("Vaciar y");
-        } else {
-            throw new Error("Y no contiene algo");
-        }
-    }
-
-    public Node llenarX() {
-        /**
-         * Llena completamente el jarro X (capacidad 3) y devuelve el nuevo
-         * nodo.
-         *
-         * @return nuevo `Node` con X = 3
-         * @throws Error si X ya está lleno
-         */
-        if (state.x() < 3) {
-            return new Node(state.setX(3)).setParent(this).setAction("llenar x");
-        } else {
-            throw new Error("x está lleno");
-        }
-    }
-
-    public Node llenarY() {
-        /**
-         * Llena completamente el jarro Y (capacidad 4) y devuelve el nuevo
-         * nodo.
-         *
-         * @return nuevo `Node` con Y = 4
-         * @throws Error si Y ya está lleno
-         */
-        if (state.y() < 4) {
-            return new Node(state.setY(4)).setParent(this).setAction("llenar y");
-        } else {
-            throw new Error("y está lleno");
-        }
-    }
-
-    public Node pasarXaY() {
-        /**
-         * Vierte agua desde X hacia Y hasta que X esté vacío o Y esté lleno.
-         *
-         * @return nuevo `Node` con los valores ajustados de X e Y
-         * @throws Error si X está vacío o Y está lleno
-         */
-        if (state.x() == 0) {
-            throw new Error("X no contiene nada");
-        }
-        if (state.y() == 4) {
-            throw new Error("Y está lleno");
-        }
-        int ny = state.x() + state.y();
-        int nx = 0;
-        if (ny > 4) {
-            nx = ny % 4;
-            ny = 4;
-        }
-        return new Node(new State(nx, ny)).setParent(this).setAction("pasar x a y");
-    }
-
-    public Node pasarYaX() {
-        /**
-         * Vierte agua desde Y hacia X hasta que Y esté vacío o X esté lleno.
-         *
-         * @return nuevo `Node` con los valores ajustados de X e Y
-         * @throws Error si Y está vacío o X está lleno
-         */
-        if (state.y() == 0) {
-            throw new Error("Y no contiene nada");
-        }
-        if (state.x() == 3) {
-            throw new Error("X está lleno");
-        }
-        int nx = state.x() + state.y();
-        int ny = 0;
-        if (nx > 3) {
-            ny = nx % 3;
-            nx = 3;
-        }
-        return new Node(new State(nx, ny)).setParent(this).setAction("pasar y a x");
+        throw new IllegalStateException();
     }
 
     public List<Node> generateChildrens() {
@@ -153,29 +67,14 @@ public class Node {
          *
          * @return lista de hijos generados
          */
-        try {
-            childrens.add(vaciarX());
-        } catch (Throwable t) {
-        }
-        try {
-            childrens.add(vaciarY());
-        } catch (Throwable t) {
-        }
-        try {
-            childrens.add(llenarX());
-        } catch (Throwable t) {
-        }
-        try {
-            childrens.add(llenarY());
-        } catch (Throwable t) {
-        }
-        try {
-            childrens.add(pasarXaY());
-        } catch (Throwable t) {
-        }
-        try {
-            childrens.add(pasarYaX());
-        } catch (Throwable t) {
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 3; y++) {
+                try {
+                    childrens.add(pasar(x, y));
+                } catch (Throwable e) {
+                    // ignore
+                }
+            }
         }
         return childrens;
     }
