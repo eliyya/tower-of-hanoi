@@ -1,6 +1,8 @@
 package com.eli;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Utilidades de validación y búsqueda auxiliares para la aplicación.
@@ -20,19 +22,19 @@ public class Validations {
             try {
                 state = Integer.parseInt(str);
             } catch (Exception e) {
-                IO.print("Tiene que ser un numero entero");
+                IO.println("Tiene que ser un numero entero");
                 System.exit(1);
             }
         } else {
-            IO.print("Tiene que ser un numero entero");
+            IO.println("Tiene que ser un numero entero");
             return -1;
         }
         if (state < 1) {
-            IO.print("No puede ser menor que 1");
+            IO.println("No puede ser menor que 1");
             return -1;
         }
         if (state > max) {
-            IO.print("No puede ser mayor que "+max);
+            IO.println("No puede ser mayor que "+max);
             return -1;
         }
         return state;
@@ -53,7 +55,11 @@ public class Validations {
         return null;
     }
 
-    static boolean canContinue(int last, int max) {
+    static boolean canContinue(int last, List<Integer> used, int max) {
+        for (var i : IntStream.range(1, max +1).toArray()) {
+            if (used.contains(i)) continue;
+            if (last > i) return true;
+        }
         return false;
     }
 }

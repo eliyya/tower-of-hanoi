@@ -16,6 +16,7 @@ public class Node {
     private ArrayList<Node> childrens = new ArrayList<Node>();
     private Node parent;
     private String action = "Inicio";
+    private int deepth = 1;
 
     public State<State<Integer>> state() {
         return state;
@@ -42,7 +43,7 @@ public class Node {
         this.state.add(new State<>());
     }
 
-    public Node(State<State<Integer>> state) {
+    public Node(State<State<Integer>> state, int deepth) {
         this.state = state;
     }
 
@@ -54,7 +55,7 @@ public class Node {
         if (d1 > d2) {
             var newState = this.state.clone();
             newState.get(y).add(newState.get(x).removeLast());
-            return new Node(newState).setParent(this).setAction(String.format("pasar %d a %d", x, y));
+            return new Node(newState, deepth-1).setParent(this).setAction(String.format("pasar %d a %d", x, y));
         }
         throw new IllegalStateException();
     }
@@ -77,6 +78,16 @@ public class Node {
             }
         }
         return childrens;
+    }
+
+    public Node solve(State<State<Integer>> finalState) {
+        if (this.state.equals(finalState)) return this;
+        if (deepth == 0) return null;
+        for (var child : generateChildrens()) {
+            var finded = child.solve(finalState);
+            if (finded != null) return finded;
+        }
+        return null;
     }
 
     @Override

@@ -4,13 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
 
 import com.google.gson.GsonBuilder;
 
 /**
- * Punto de entrada de la aplicación que resuelve el problema de los jarros
- * (jarras) de agua usando búsqueda en anchura (BFS).
+ * Punto de entrada de la aplicación que resuelve el problema de las torres de Hanoi usando búsqueda en profundidad (DFS).
  * <p>
  * El código construye un árbol de estados a partir del estado inicial y
  * expande niveles sucesivos hasta encontrar el estado objetivo. Al
@@ -18,7 +16,7 @@ import com.google.gson.GsonBuilder;
  */
 public class App {
     /**
-     * Ejecuta la búsqueda en anchura para encontrar el estado objetivo y
+     * Ejecuta la búsqueda en profundidad para encontrar el estado objetivo y
      * guarda el árbol generado en `tree.json`.
      *
      * @param args argumentos de línea de comandos (no usados)
@@ -27,17 +25,14 @@ public class App {
     public static void main(String[] args) throws IOException {
         var startState = getState(true);
         var finalState = getState(false);
+        var deepth = Validations.validateDisc(IO.readln("Cuántos niveles máximos quieres que se genere?: "), Integer.MAX_VALUE);
 
-        var tree = new Node(startState);
-        var level = new ArrayList<Node>(List.of(tree));
-
-        Node finded;
-        while ((finded = Validations.find(level, finalState)) == null) {
-            var childrens = new ArrayList<Node>(level);
-            level.clear();
-            for (var node : childrens) {
-                level.addAll(node.generateChildrens());
-            }
+        var tree = new Node(startState, deepth);
+        
+        var finded = tree.solve(finalState);
+        if (finded == null) {
+            IO.println("No se encontró solución");
+            return;
         }
         IO.println("Encontrado");
 
@@ -62,10 +57,19 @@ public class App {
         var state = new State<State<Integer>>();
         var disks = new State<Integer>();
         for (int t = 0; t < 3; t++) {
-            IO.println(String.format("Estado %s de la torre %d...", init ? "inicial" : "final", t+1));
             var tower = new State<Integer>();
+            state.add(tower);
+            if (disks.size() == 3 || (!tower.isEmpty() && !Validations.canContinue(tower.getLast(), disks, 3))) {
+                continue;
+            }
+            IO.println(String.format("Estado %s de la torre %d...", init ? "inicial" : "final", t+1));
             for (int i = 0; i < 3; i++) {
-                var s = Validations.validateDisc(IO.readln("ingrese de 1 a 3 (deje en blanco para la siguiente torre):"), 3);
+                // IO.println(!tower.isEmpty());
+                // IO.println(!tower.isEmpty() && !Validations.canContinue(tower.getLast(), disks, 3));
+                if (disks.size() == 3 || (!tower.isEmpty() && !Validations.canContinue(tower.getLast(), disks, 3))) {
+                    break;
+                }
+                var s = Validations.validateDisc(IO.readln("ingrese de 1 a 3 (deje en blanco para la siguiente torre): "), 3);
                 if (s == -1) {
                     i--;
                     continue;
@@ -77,13 +81,14 @@ public class App {
                         i--;
                         continue;
                     }
-                    disks.add(s);
                     if (tower.isEmpty()) {
+                        disks.add(s);
                         tower.add(s);
                     } else {
                         var last = tower.getLast();
                         if (last > s) {
                             tower.add(s);
+                            disks.add(s);
                             continue;
                         } 
                         IO.println("No se puede colocar un disco más grande sobre uno más pequeño");
@@ -91,7 +96,6 @@ public class App {
                     }
                 }
             }
-            state.add(tower);
         }
         return state;   
     }
