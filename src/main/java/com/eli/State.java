@@ -2,11 +2,20 @@ package com.eli;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Representa el estado de los dos jarros: cantidad de agua en X y en Y.
  */
 public class State<T> extends ArrayList<T> {
+
+    State(List<T> items) {
+        super(items);
+    }
+
+    State() {
+        super();
+    }
 
     @Override
     public final boolean equals(Object obj) {
