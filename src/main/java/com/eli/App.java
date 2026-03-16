@@ -29,19 +29,29 @@ public class App {
 
         var tree = new Node(startState, deepth);
         
-        var finded = tree.solve(finalState);
-        if (finded == null) {
+        var finded = tree.solve(finalState, () -> {
+            try {
+                Files.writeString(
+                        Paths.get("tree.json"),
+                        new GsonBuilder()
+                                .setPrettyPrinting()
+                                .create().toJson(tree.toMap()));
+            } catch (IOException e) {
+            }
+        });
+        if (finded != null) {
+            IO.println("Encontrado");
+            
+            var path = new ArrayList<Node>();
+            do {
+                path.add(finded);
+                finded = finded.parent();
+            } while (finded != null);
+            path.reversed().forEach(IO::println);
+        } else {
             IO.println("No se encontró solución");
-            return;
         }
-        IO.println("Encontrado");
 
-        var path = new ArrayList<Node>();
-        do {
-            path.add(finded);
-            finded = finded.parent();
-        } while (finded != null);
-        path.reversed().forEach(IO::println);
 
         Files.writeString(
                 Paths.get("tree.json"),
@@ -49,7 +59,7 @@ public class App {
                         .setPrettyPrinting()
                         .create().toJson(tree.toMap()));
 
-        IO.println("Se generó un archivo tree.json para visualizar el tree generado en jsoncrack.eliyya.dev/editor");
+        IO.println("Se generó un archivo tree.json para visualizar el tree generado en https://jsoncrack.eliyya.dev/editor");
 
     }
 

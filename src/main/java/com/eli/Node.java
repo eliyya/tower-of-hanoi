@@ -45,17 +45,17 @@ public class Node {
 
     public Node(State<State<Integer>> state, int deepth) {
         this.state = state;
+        this.deepth = deepth;
     }
 
     public Node pasar(int x, int y) {
         var t1 = this.state.get(x);
         var t2 = this.state.get(y);
         var d1 = t1.getLast();
-        var d2 = t2.getLast();
-        if (d1 > d2) {
+        if (t2.isEmpty() || d1 < t2.getLast()) {
             var newState = this.state.clone();
             newState.get(y).add(newState.get(x).removeLast());
-            return new Node(newState, deepth-1).setParent(this).setAction(String.format("pasar %d a %d", x, y));
+            return new Node(newState, deepth-1).setParent(this).setAction(String.format("pasar %d a %d", x+1, y+1));
         }
         throw new IllegalStateException();
     }
@@ -71,7 +71,8 @@ public class Node {
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 try {
-                    childrens.add(pasar(x, y));
+                    var child = pasar(x, y);
+                    childrens.add(child);
                 } catch (Throwable e) {
                     // ignore
                 }
@@ -80,11 +81,13 @@ public class Node {
         return childrens;
     }
 
-    public Node solve(State<State<Integer>> finalState) {
+    public Node solve(State<State<Integer>> finalState, Runnable onGenerateChildrens) {
         if (this.state.equals(finalState)) return this;
         if (deepth == 0) return null;
-        for (var child : generateChildrens()) {
-            var finded = child.solve(finalState);
+        var childrens = generateChildrens();
+        onGenerateChildrens.run();
+        for (var child : childrens) {
+            var finded = child.solve(finalState, onGenerateChildrens);
             if (finded != null) return finded;
         }
         return null;
