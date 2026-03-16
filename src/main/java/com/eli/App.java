@@ -34,7 +34,7 @@ public class App {
 
         var tree = new Node(initialState, deepth);
 
-        var finded = tree.solve(finalState);
+        var finded = tree.solve(finalState, ()->{});
         if (finded == null) {
             IO.println("No se encontró solución");
         }
@@ -54,7 +54,7 @@ public class App {
         var state = new State<State<Integer>>(IntStream.range(0, range).mapToObj(i -> new State<Integer>()).toList());
         for (var i : new int[] { 3, 2, 1 }) {
             while (true) {
-                var nt = Validations.validateTower(IO.readln(String.format("Donde quieres colocar el disco %d: ", i)),
+                var nt = Validations.validateTower(IO.readln(String.format("Donde quieres colocar el disco %d (1-3): ", i)),
                         3);
                 if (nt == -1) {
                     continue;
