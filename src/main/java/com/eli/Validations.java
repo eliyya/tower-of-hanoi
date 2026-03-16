@@ -15,10 +15,9 @@ public class Validations {
      * @param max  valor máximo permitido (inclusive)
      * @return el entero parseado si es válido
      */
-    public static int validateDisc(Object read, int max) {
+    public static int validateTower(Object read, int max) {
         int state = 1;
         if (read instanceof String str) {
-            if (str.isBlank()) return 0;
             try {
                 state = Integer.parseInt(str);
             } catch (Exception e) {
