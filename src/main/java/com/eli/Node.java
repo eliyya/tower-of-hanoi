@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Nodo del árbol de estados usado por la búsqueda en anchura. Cada nodo
@@ -24,6 +25,10 @@ public class Node {
 
     public Node parent() {
         return parent;
+    }
+
+    public int deepth() {
+        return this.deepth;
     }
 
     private Node setParent(Node parent) {
@@ -81,14 +86,16 @@ public class Node {
         return childrens;
     }
 
-    public Node solve(State<State<Integer>> finalState, Runnable onGenerateChildrens) {
+    public Node solve(State<State<Integer>> finalState, Consumer<Node> onGenerateChildrens) {
         if (this.state.equals(finalState)) return this;
         if (deepth == 0) return null;
         var childrens = generateChildrens();
-        onGenerateChildrens.run();
+        onGenerateChildrens.accept(this);
         for (var child : childrens) {
             var finded = child.solve(finalState, onGenerateChildrens);
-            if (finded != null) return finded;
+            if (finded != null) {
+                return finded;
+            }
         }
         return null;
     }

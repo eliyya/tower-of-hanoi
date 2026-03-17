@@ -34,11 +34,24 @@ public class App {
 
         var tree = new Node(initialState, deepth);
 
-        var finded = tree.solve(finalState, ()->{});
+        var finded = tree.solve(finalState, (n) -> {
+            // IO.print(String.format("Exploring leve %s", n.deepth()));
+        });
+        
         if (finded == null) {
             IO.println("No se encontró solución");
+        } else {
+            var last = finded;
+            var solution = new ArrayList<Node>();
+            solution.add(last);
+            while (last.parent() != null) {
+                last = last.parent();
+                solution.add(last);
+            }
+            for (var node : solution.reversed()) {
+                IO.println(node);
+            }
         }
-
 
         Files.writeString(
                 Paths.get("tree.json"),
@@ -46,7 +59,8 @@ public class App {
                         .setPrettyPrinting()
                         .create().toJson(tree.toMap()));
 
-        IO.println("Se generó un archivo tree.json para visualizar el tree generado en https://jsoncrack.eliyya.dev/editor");
+        IO.println(
+                "Se generó un archivo tree.json para visualizar el tree generado en https://jsoncrack.eliyya.dev/editor");
 
     }
 
@@ -54,8 +68,8 @@ public class App {
         var state = new State<State<Integer>>(IntStream.range(0, range).mapToObj(i -> new State<Integer>()).toList());
         for (var i : new int[] { 3, 2, 1 }) {
             while (true) {
-                var nt = Validations.validateTower(IO.readln(String.format("Donde quieres colocar el disco %d (1-3): ", i)),
-                        3);
+                var nt = Validations
+                        .validateTower(IO.readln(String.format("Donde quieres colocar el disco %d (1-3): ", i)), 3);
                 if (nt == -1) {
                     continue;
                 }
