@@ -50,7 +50,7 @@ public class App {
             }
             var rev = solution.reversed();
             for (var i = 0; i < rev.size(); i++) {
-                IO.println(String.format("%d: %s", i, rev.get(i)));
+                IO.println(String.format("%d %s", i, rev.get(i)));
             }
         }
 
