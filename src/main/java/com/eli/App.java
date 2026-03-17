@@ -37,7 +37,7 @@ public class App {
         var finded = tree.solve(finalState, (n) -> {
             // IO.print(String.format("Exploring leve %s", n.deepth()));
         });
-        
+
         if (finded == null) {
             IO.println("No se encontró solución");
         } else {
@@ -48,8 +48,9 @@ public class App {
                 last = last.parent();
                 solution.add(last);
             }
-            for (var node : solution.reversed()) {
-                IO.println(node);
+            var rev = solution.reversed();
+            for (var i = 0; i < rev.size(); i++) {
+                IO.println(String.format("%d: %s", i, rev.get(i)));
             }
         }
 
