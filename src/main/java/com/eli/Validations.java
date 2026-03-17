@@ -1,9 +1,5 @@
 package com.eli;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.IntStream;
-
 /**
  * Utilidades de validación y búsqueda auxiliares para la aplicación.
  */
@@ -39,26 +35,4 @@ public class Validations {
         return state;
     }
 
-    /**
-     * Busca en una lista de nodos un nodo cuyo estado sea igual al indicado.
-     *
-     * @param list  lista de nodos a buscar
-     * @param state estado objetivo
-     * @return el nodo encontrado o `null` si no existe
-     */
-    static Node find(ArrayList<Node> list, State<?> state) {
-        for (Node node : list) {
-            if (node.state().equals(state))
-                return node;
-        }
-        return null;
-    }
-
-    static boolean canContinue(int last, List<Integer> used, int max) {
-        for (var i : IntStream.range(1, max +1).toArray()) {
-            if (used.contains(i)) continue;
-            if (last > i) return true;
-        }
-        return false;
-    }
 }

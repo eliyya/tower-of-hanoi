@@ -1,10 +1,7 @@
 package com.eli;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * Nodo del árbol de estados usado por la búsqueda en anchura. Cada nodo
@@ -17,7 +14,6 @@ public class Node {
     private ArrayList<Node> childrens = new ArrayList<Node>();
     private Node parent;
     private String action = "Inicio";
-    private int deepth = 1;
 
     public State<State<Integer>> state() {
         return state;
@@ -25,10 +21,6 @@ public class Node {
 
     public Node parent() {
         return parent;
-    }
-
-    public int deepth() {
-        return this.deepth;
     }
 
     private Node setParent(Node parent) {
@@ -48,9 +40,8 @@ public class Node {
         this.state.add(new State<>());
     }
 
-    public Node(State<State<Integer>> state, int deepth) {
+    public Node(State<State<Integer>> state) {
         this.state = state;
-        this.deepth = deepth;
     }
 
     public Node pasar(int x, int y) {
@@ -60,7 +51,7 @@ public class Node {
         if (t2.isEmpty() || d1 < t2.getLast()) {
             var newState = this.state.clone();
             newState.get(y).add(newState.get(x).removeLast());
-            return new Node(newState, deepth-1).setParent(this).setAction(String.format("pasar %d a %d", x+1, y+1));
+            return new Node(newState).setParent(this).setAction(String.format("pasar %d a %d", x+1, y+1));
         }
         throw new IllegalStateException();
     }
@@ -86,31 +77,8 @@ public class Node {
         return childrens;
     }
 
-    public Node solve(State<State<Integer>> finalState, Consumer<Node> onGenerateChildrens) {
-        if (this.state.equals(finalState)) return this;
-        if (deepth == 0) return null;
-        var childrens = generateChildrens();
-        onGenerateChildrens.accept(this);
-        for (var child : childrens) {
-            var finded = child.solve(finalState, onGenerateChildrens);
-            if (finded != null) {
-                return finded;
-            }
-        }
-        return null;
-    }
-
     @Override
     public String toString() {
         return String.format("%s  \t -> %s", this.action, state.toString());
-    }
-
-    public Map<String, Object> toMap() {
-        var map = new HashMap<String, Object>();
-        map.put("", state.toString());
-        this.childrens.forEach(c -> {
-            map.put(c.action, c.toMap());
-        });
-        return map;
     }
 }

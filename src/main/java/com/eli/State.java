@@ -39,7 +39,6 @@ public class State<T> extends ArrayList<T> {
                 clone.add((T) item.getClass().getMethod("clone").invoke(item));
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 clone.add(item);
-                // IO.println("No se pudo clonar el item: " + item);
             }
         }
         return clone;
