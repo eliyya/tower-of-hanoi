@@ -1,47 +1,74 @@
 package com.eli;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
+public class State {
 
-/**
- * Representa el estado de los dos jarros: cantidad de agua en X y en Y.
- */
-public class State<T> extends ArrayList<T> {
+    public static int[][] getState() {
+        var state = new int[][] {
+                {9,9,9},
+                {9,9,9},
+                {9,9,9},
+        };
 
-    State(List<T> items) {
-        super(items);
-    }
-
-    State() {
-        super();
-    }
-
-    @Override
-    public final boolean equals(Object obj) {
-        if (obj instanceof State s) {
-            return s.toString().equals(this.toString());
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("(%s)", String.join(",", this.stream().map(i -> i.toString()).toList()));
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public State<T> clone() {
-        var clone = new State<T>();
-        for (var item : this) {
-            try {
-                clone.add((T) item.getClass().getMethod("clone").invoke(item));
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                clone.add(item);
-                // IO.println("No se pudo clonar el item: " + item);
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                state[y][x] = 10;
+                while (true) {
+                    print(state);
+                    var response = IO.readln("¿Que valor desea agregar aqui? ");
+                    var number = Validations.validateNumber(response);
+                    if (number == null) {
+                        IO.println("Numero debe se un entero");
+                        continue;
+                    } else if (number < 0 || number > 8) {
+                        IO.println("Numero debe estar entre 0 y 8");
+                        continue;
+                    }
+                    var repeat = findPosition(state, number);
+                    if (repeat != null) {
+                        IO.println("Numero ya esta en el estado");
+                        continue;
+                    }
+                    state[y][x] = number;
+                    break;
+                }
             }
         }
-        return clone;
+        return state;
+    }
+
+    public static int[][] clone(int[][] state){
+        var clon = new int[3][3];
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                clon[y][x] = state[y][x];
+            }
+        }
+        return clon;
+    }
+
+    public static void print(int[][] state) {
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                if (state[y][x] == 9) {
+                    IO.print("_ ");
+                } else if(state[y][x] == 10) {
+                    IO.print("# ");
+                } else {
+                    IO.print(state[y][x]+" ");
+                }
+            }
+            IO.println();
+        }
+    }
+
+    public static int[] findPosition(int[][] state, int number) {
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                if (state[y][x] == number) {
+                    return new int[]{y, x};
+                }
+            }
+        }
+        return null;
     }
 }
